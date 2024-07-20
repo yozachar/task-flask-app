@@ -1,19 +1,35 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
-    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
-    <title>Cajon</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Web application for data interaction." />
+  <meta name="keywords" content="web-app, data, visualization" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" />
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
+  {% block head %}
+  {% endblock head %}
+  <title>
+    {% block title %}
+    {% endblock title %}
+  </title>
 </head>
 
 <body>
-    <main class="container">
-        <h1>Hello Cajon!</h1>
-    </main>
+  <header>
+    {% block header %}
+    {% endblock header %}
+  </header>
+  <main>
+    {% block main %}
+    {% endblock main %}
+  </main>
+  <footer>
+    {% block footer %}
+    {% endblock footer %}
+  </footer>
 </body>
 
 </html>
