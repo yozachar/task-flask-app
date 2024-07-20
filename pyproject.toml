@@ -1,14 +1,14 @@
 [project]
 name = "task-flask-app"
 version = "0.1.0"
-description = "Default template for PDM package"
+description = "A web application that allows users to log in, upload large CSV files (up to 1GB), and interact with the uploaded data through filtering. The application will display the count of records that match the applied filters."
 authors = [
-    {name = "Jovial Joe Jayarson", email = "38415384+yozachar@users.noreply.github.com"},
+    { name = "Jovial Joe Jayarson", email = "38415384+yozachar@users.noreply.github.com" },
 ]
 dependencies = []
 requires-python = ">=3.12"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 
 [tool.pdm]
