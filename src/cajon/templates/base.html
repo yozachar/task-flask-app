@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Web application for data interaction." />
   <meta name="keywords" content="web-app, data, visualization" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
   {% block head %}
@@ -20,10 +20,10 @@
 
 <body>
   {% block header %}
-  <header>
+  <header class="container">
     <nav>
       <ul>
-        <li><a class="nav-head" href="/"><strong>CAJÓN</strong></a></li>
+        <li><a class="nav-head contrast" href="/"><strong>CAJÓN</strong></a></li>
       </ul>
       <ul>
         {% block nav_actions %}

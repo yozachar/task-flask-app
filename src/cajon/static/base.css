@@ -1,11 +1,4 @@
 .nav-head {
   font-size: 1.7rem;
   text-decoration: none;
-  color: white;
-}
-
-@media (prefers-color-scheme: light) {
-  .nav-head {
-    color: black;
-  }
 }
