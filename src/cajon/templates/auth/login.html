@@ -1,4 +1,4 @@
-{% extends "auth/_auth_form.html" %}
+{% extends "base.html" %}
 
 {% block title %}
 Login
@@ -8,6 +8,20 @@ Login
 <li><a href="/signup" class="secondary">Register</a></li>
 {% endblock nav_actions %}
 
-{% block action %}
-<input type="submit" value="Login" />
-{% endblock action %}
+{% block main %}
+<main class="container">
+  <form method="post">
+    <fieldset>
+      <label>
+        Email
+        <input type="email" name="email" placeholder="Email" aria-label="Email" autocomplete="email" />
+      </label>
+      <label>
+        Password
+        <input type="password" name="password" placeholder="Password" aria-label="Password" />
+      </label>
+    </fieldset>
+    <input type="submit" value="Login" />
+  </form>
+</main>
+{% endblock main %}

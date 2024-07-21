@@ -7,9 +7,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Web application for data interaction." />
   <meta name="keywords" content="web-app, data, visualization" />
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
   {% block head %}
   {% endblock head %}
   <title>
@@ -30,6 +30,13 @@
         {% endblock nav_actions %}
       </ul>
     </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}" role="alert">{{ msg }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
   </header>
   {% endblock header %}
 
