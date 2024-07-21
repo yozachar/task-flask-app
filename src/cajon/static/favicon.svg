@@ -7,7 +7,7 @@
         }
 
         path.icon-foreground {
-            fill: #FFFF00;
+            fill: #F1F1F1;
         }
 
         @media (prefers-color-scheme: light) {
@@ -16,7 +16,7 @@
             }
 
             path.icon-foreground {
-                fill: #FF0000;
+                fill: #017FC0;
             }
         }
     </style>

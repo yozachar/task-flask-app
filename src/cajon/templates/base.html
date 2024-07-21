@@ -8,6 +8,7 @@
   <meta name="description" content="Web application for data interaction." />
   <meta name="keywords" content="web-app, data, visualization" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}">
   {% block head %}
   {% endblock head %}
@@ -18,18 +19,22 @@
 </head>
 
 <body>
+  {% block header %}
   <header>
-    {% block header %}
-    {% endblock header %}
+    <nav>
+      <ul>
+        <li><a class="nav-head" href="/"><strong>CAJÓN</strong></a></li>
+      </ul>
+      <ul>
+        {% block nav_actions %}
+        {% endblock nav_actions %}
+      </ul>
+    </nav>
   </header>
-  <main>
-    {% block main %}
-    {% endblock main %}
-  </main>
-  <footer>
-    {% block footer %}
-    {% endblock footer %}
-  </footer>
+  {% endblock header %}
+
+  {% block main %}
+  {% endblock main %}
 </body>
 
 </html>
