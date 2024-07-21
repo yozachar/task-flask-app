@@ -1,3 +1,7 @@
+####################
+#     Metadata     #
+####################
+
 [project]
 name = "cajon"
 version = "0.1.0"
@@ -12,13 +16,89 @@ dependencies = [
     "Flask>=3.0.3",
     "Flask-SQLAlchemy>=3.1.1",
     "python-dotenv>=1.0.1",
+    "Flask-Login>=0.6.3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/yozachar/task-flask-app"
+Documentation = "https://github.com/yozachar/task-flask-app"
+Repository = "https://github.com/yozachar/task-flask-app"
+
+##############################
+#  Development Dependencies  #
+##############################
+
+[tool.pdm.dev-dependencies]
+sast = ["bandit[toml]>=1.7.9"]
+tooling = ["djlint>=1.34.1", "black>=24.4.2", "ruff>=0.5.4", "pyright>=1.1.372"]
+
+####################
+#  Configurations  #
+####################
 
 [tool.pdm]
 distribution = false
 
-[tool.pdm.dev-dependencies]
-linting = [
-    "djlint>=1.34.1",
+[tool.bandit]
+exclude_dirs = [
+    ".github",
+    ".pytest_cache",
+    ".tox",
+    ".venv",
+    ".venv.dev",
+    ".vscode",
+    "site",
+    "tests",
 ]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.pyright]
+extraPaths = ["src"]
+exclude = [
+    "**/__pycache__/",
+    ".pytest_cache/",
+    ".tox/",
+    ".venv/",
+    ".venv.dev/",
+    "site/",
+]
+pythonVersion = "3.12"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.ruff]
+lint.select = [
+    # Pyflakes
+    "F",
+    # pycodestyle
+    "W",
+    "E",
+    # mccabe
+    # C90
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pydocstyle
+    "D",
+]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["**/__pycache__", ".pytest_cache", "site"]
+
+[tool.ruff.lint.isort]
+# case-sensitive = true
+combine-as-imports = true
+force-sort-within-sections = true
+force-wrap-aliases = true
+known-local-folder = ["src"]
+relative-imports-order = "closest-to-furthest"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
