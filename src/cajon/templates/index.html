@@ -6,7 +6,9 @@ Welcome
 
 {% block nav_actions %}
 {% if logged_in %}
-<li><a href="/logout">Logout</a></li>
+<li><a href="/upload">Upload</a></li>
+<li><a href="/query">Query</a></li>
+<li><a href="/logout"><button class="secondary">Logout</button></a></li>
 {% else %}
 <li><a href="/login">Login</a></li>
 <li><a href="/signup"><button>Register</button></a></li>
