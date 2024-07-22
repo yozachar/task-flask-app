@@ -5,7 +5,7 @@
 groups = ["default", "sast", "tooling"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.2"
-content_hash = "sha256:19fc01a15a31d76a9836363c45325aee45b72ad9567af94dcde324e133a859e8"
+content_hash = "sha256:ef371f0be6ae858ccd2fafb3318412163570632d49b8cd6e222bf0b683ff58da"
 
 [[package]]
 name = "bandit"
