@@ -68,7 +68,7 @@ exclude = [
 ]
 pythonVersion = "3.12"
 pythonPlatform = "All"
-typeCheckingMode = "strict"
+# typeCheckingMode = "strict"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

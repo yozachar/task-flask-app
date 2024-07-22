@@ -1,7 +1,7 @@
 """Models."""
 
 # external
-from flask_login import UserMixin  # type: ignore
+from flask_login import UserMixin
 
 # local
 from . import db
