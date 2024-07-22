@@ -40,6 +40,8 @@ def create_app():
     db_path = (project / "backend/database" / environ["DB_NAME"]).absolute()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     # expect KeyError & sqlalchemy.exc.NoSuchModuleError
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024 * 1024  # 10 GB
     db.init_app(app)
 
     # local

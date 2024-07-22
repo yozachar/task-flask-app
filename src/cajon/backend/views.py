@@ -5,16 +5,17 @@ from datetime import datetime
 from pathlib import Path
 
 # external
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 
 # local
 from ._utils import auth_required
 
-views = Blueprint("views", __name__)
 ALLOWED_EXTENSIONS = ("CSV",)
 UPLOAD_PATH = Path(__file__).parent / "database"
+
+views = Blueprint("views", __name__)
 
 
 @views.route("/")
@@ -51,3 +52,13 @@ def _handle_upload():
     uploaded_file.save(UPLOAD_PATH / s_file)
     flash("File uploaded.", category="success")
     return True
+
+
+# --------------> error handlers <--------------
+
+
+@views.errorhandler(413)
+def _request_entity_too_large(error):
+    # TODO: organize error handlers
+    flash("File too large!", category="error")
+    return redirect(url_for("views.upload"))
