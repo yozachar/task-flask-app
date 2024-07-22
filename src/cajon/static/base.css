@@ -5,7 +5,7 @@
 
 /* Basic PicoCSS alerts */
 /* https://github.com/picocss/pico/issues/12 */
-.alert-danger {
+.alert-error {
   --background-color: #ffebee;
   --color: #b71c1c;
   --icon: var(--pico-icon-invalid);
