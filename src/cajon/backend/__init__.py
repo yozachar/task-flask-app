@@ -30,14 +30,26 @@ def _manage_session(app: Flask):
 
 def create_app():
     """Create flask app."""
-    project = Path(__file__).parent.parent
+    cajon = Path(__file__).parent.parent  # cajon directory
 
     # app
-    app = Flask(__name__, template_folder=project / "templates", static_folder=project / "static")
+    app = Flask(__name__, template_folder=cajon / "templates", static_folder=cajon / "static")
     app.config["SECRET_KEY"] = environ["SECRET_KEY"]  # expect KeyError
+    # NOTE: os.urandom(24) is an alternative to static SECRET_KEY
+    app.config["UPLOAD_FOLDER"] = cajon / "backend/uploads"
+
+    # celery
+    app.config.from_mapping(
+        CELERY=dict(
+            broker_url="redis://localhost",
+            result_backend="redis://localhost",
+            task_ignore_result=True,
+        ),
+    )
+    app.config.from_prefixed_env()
 
     # database
-    db_path = (project / "backend/database" / environ["DB_NAME"]).absolute()
+    db_path = (cajon / "backend/database" / environ["DB_NAME"]).absolute()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     # expect KeyError & sqlalchemy.exc.NoSuchModuleError
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -45,6 +57,7 @@ def create_app():
     db.init_app(app)
 
     # local
+    from ._utils import celery_init_app
     from .auth import auth
     from .models import User  # `db` must be defined before `User` is imported
     from .views import views
@@ -53,7 +66,9 @@ def create_app():
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
 
+    # db, task, session
     _create_db(app, db_path)
+    celery_init_app(app)
     lgm = _manage_session(app)
 
     @lgm.user_loader

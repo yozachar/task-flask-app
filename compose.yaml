@@ -1,0 +1,6 @@
+services:
+  # celery broker
+  redis:
+    image: "docker.io/redis:latest"
+    ports:
+      - "6379:6379"

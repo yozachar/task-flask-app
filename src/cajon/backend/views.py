@@ -1,19 +1,12 @@
 """Views."""
 
-# standard
-from datetime import datetime
-from pathlib import Path
-
 # external
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user
-from werkzeug.utils import secure_filename
 
 # local
 from ._utils import auth_required
-
-ALLOWED_EXTENSIONS = ("CSV",)
-UPLOAD_PATH = Path(__file__).parent / "database"
+from .upload import handle_upload
 
 views = Blueprint("views", __name__)
 
@@ -25,33 +18,16 @@ def home():
 
 
 @views.route("/upload", methods=["GET", "POST"])
-@auth_required  # TODO: add HTTP redirect codes?
+@auth_required
 def upload():
     """Upload View."""
     if request.method == "POST":
         if "file" in request.files:
-            _handle_upload()
+            r_file = request.files["file"]
+            handle_upload.delay(r_file)
+            flash("File uploaded. Processing in the background.", category="success")
+        return redirect(url_for("views.upload"))
     return render_template("actions/upload.html", logged_in=current_user.is_authenticated)
-
-
-# --------------> accessory functions <--------------
-
-
-def _handle_upload():
-    uploaded_file = request.files["file"]
-    filename = uploaded_file.filename
-    if not filename:
-        return False
-    if (
-        "." in filename
-        and len(filename) < 3
-        and filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
-    ):
-        return False
-    s_file = secure_filename(filename).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
-    uploaded_file.save(UPLOAD_PATH / s_file)
-    flash("File uploaded.", category="success")
-    return True
 
 
 # --------------> error handlers <--------------
