@@ -2,17 +2,19 @@
 
 # external
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 # local
 from . import db
+from ._utils import auth_required, authenticated
 from .models import User
 
 auth = Blueprint("auth", __name__)
 
 
 @auth.route("/signup", methods=["GET", "POST"])
+@authenticated
 def signup():
     """Login View."""
     if request.method == "POST":
@@ -26,6 +28,7 @@ def signup():
 
 
 @auth.route("/login", methods=["GET", "POST"])
+@authenticated
 def login():
     """Login View."""
     if request.method == "POST":
@@ -37,7 +40,7 @@ def login():
 
 
 @auth.route("/logout")
-@login_required
+@auth_required
 def logout():
     """Logout."""
     logout_user()
@@ -67,7 +70,7 @@ def _login_user(email: str, password: str):
         login_user(user, remember=True)
         flash("Login successful!", category="success")
         return redirect(url_for("views.home"))
-    flash("Incorrect login credentials, try again.", category="error")
+    flash("Incorrect login credentials. Please try again.", category="error")
     return
 
 

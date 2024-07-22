@@ -14,3 +14,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(37), unique=True)
     password = db.Column(db.String(37))
     name = db.Column(db.String(148))
+
+    def get_id(self):
+        """Get user id."""
+        return self.uid
