@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = ("CSV",)
 UPLOAD_PATH = Path(__file__).parent / "uploads"
+if not UPLOAD_PATH.exists():
+    UPLOAD_PATH.mkdir(parents=True)
 
 
 @shared_task

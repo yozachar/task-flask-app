@@ -12,13 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 db = SQLAlchemy()
-
-
-def _create_db(app: Flask, db_path: Path):
-    if db_path.exists() and db_path.is_file():
-        return
-    with app.app_context():
-        db.create_all()
+cajon = Path(__file__).parent.parent
 
 
 def _manage_session(app: Flask):
@@ -28,14 +22,9 @@ def _manage_session(app: Flask):
     return login_manager
 
 
-def create_app():
-    """Create flask app."""
-    cajon = Path(__file__).parent.parent  # cajon directory
-
-    # app
-    app = Flask(__name__, template_folder=cajon / "templates", static_folder=cajon / "static")
+def _config_flask(app: Flask):
     app.config["SECRET_KEY"] = environ["SECRET_KEY"]  # expect KeyError
-    # NOTE: os.urandom(24) is an alternative to static SECRET_KEY
+    # NOTE: os.urandom(Integer) is an alternative to static SECRET_KEY
     app.config["UPLOAD_FOLDER"] = cajon / "backend/uploads"
 
     # celery
@@ -49,25 +38,37 @@ def create_app():
     app.config.from_prefixed_env()
 
     # database
-    db_path = (cajon / "backend/database" / environ["DB_NAME"]).absolute()
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    # expect KeyError
+    _pg_user = environ["POSTGRES_USER"]
+    _pg_passwd = environ["POSTGRES_PASSWORD"]
+    _db_host = environ["PG_DB_HOST"]
+    _db_port = environ["PG_DB_PORT"]
+    _db_name = environ["POSTGRES_DB"]
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"postgresql+psycopg://{_pg_user}:{_pg_passwd}@{_db_host}:{_db_port}/{_db_name}"
+    )
     # expect KeyError & sqlalchemy.exc.NoSuchModuleError
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024 * 1024  # 10 GB
+
+
+def _peripherals(app: Flask):
+    # initialize app for use with SQLAlchemy ORM
     db.init_app(app)
 
-    # local
+    # local imports
     from ._utils import celery_init_app
     from .auth import auth
     from .models import User  # `db` must be defined before `User` is imported
     from .views import views
 
-    # sub-apps
+    # blueprints
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
 
     # db, task, session
-    _create_db(app, db_path)
+    with app.app_context():
+        db.create_all()
     celery_init_app(app)
     lgm = _manage_session(app)
 
@@ -76,7 +77,13 @@ def create_app():
         # expect ValueError
         return User.query.get(int(uid))
 
+
+def create_app():
+    """Create flask app."""
+    app = Flask(__name__, template_folder=cajon / "templates", static_folder=cajon / "static")
+    _config_flask(app)
+    _peripherals(app)
     return app
 
 
-__all__ = ("create_app", "db")
+__all__ = ("create_app", "db", "cajon")

@@ -13,12 +13,12 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.12"
 dependencies = [
-    "Flask>=3.0.3",
-    "Flask-SQLAlchemy>=3.1.1",
-    "python-dotenv>=1.0.1",
-    "Flask-Login>=0.6.3",
-    "werkzeug>=3.0.3",
     "celery[redis]>=5.4.0",
+    "Flask-Login>=0.6.3",
+    "Flask-SQLAlchemy>=3.1.1",
+    "Flask>=3.0.3",
+    "psycopg[binary]>=3.2.1",
+    "python-dotenv>=1.0.1",
 ]
 
 [project.urls]
@@ -32,7 +32,7 @@ Repository = "https://github.com/yozachar/task-flask-app"
 
 [tool.pdm.dev-dependencies]
 sast = ["bandit[toml]>=1.7.9"]
-tooling = ["djlint>=1.34.1", "black>=24.4.2", "ruff>=0.5.4", "pyright>=1.1.372"]
+tooling = ["black>=24.4.2", "djlint>=1.34.1", "pyright>=1.1.372", "ruff>=0.5.4"]
 
 ####################
 #  Configurations  #

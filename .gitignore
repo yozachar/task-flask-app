@@ -172,4 +172,4 @@ cython_debug/
 .vscode/
 
 # project
-**/database/*.csv
+**/uploads/*.csv

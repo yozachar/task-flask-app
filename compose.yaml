@@ -2,5 +2,39 @@ services:
   # celery broker
   redis:
     image: "docker.io/redis:latest"
+    restart: "always"
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: "1s"
+      timeout: "5s"
+      retries: "10"
+    volumes:
+      - "rdb:/data"
+
+  # primary db
+  postgres:
+    image: "docker.io/postgres:latest"
+    restart: "always"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "$POSTGRES_USER"
+      POSTGRES_DB: "$POSTGRES_DB"
+      POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: "1s"
+      timeout: "5s"
+      retries: "10"
+    volumes:
+      - "pdb:/var/lib/postgresql/data"
+
+  # depends_on:
+  #   postgres:
+  #     condition: service_healthy
+
+volumes:
+  rdb:
+  pdb:

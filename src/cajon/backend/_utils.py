@@ -5,8 +5,24 @@ from functools import wraps
 
 # external
 from celery import Celery, Task
-from flask import Flask, flash, redirect, url_for
+from flask import Flask, flash, redirect, request, url_for
 from flask_login import current_user
+from sqlalchemy.exc import SQLAlchemyError
+
+
+def expect_sql_error(func):
+    """Check authentication."""
+
+    @wraps(func)
+    def _decorated_function(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except SQLAlchemyError as e:
+            # print(e) # TODO: remove before production
+            flash("DataBase error. Please contact developer.", category="error")
+        return redirect(request.url)
+
+    return _decorated_function
 
 
 def auth_required(func):
@@ -36,7 +52,7 @@ def authenticated(func):
 
 
 def celery_init_app(app: Flask) -> Celery:
-    """Celery Init App."""
+    """Celery init flask app."""
     # https://flask.palletsprojects.com/en/2.2.x/patterns/celery/
 
     class FlaskTask(Task):
