@@ -4,7 +4,14 @@
 <main class="container">
   <h3>Query Builder</h3>
   <form method="post">
-    <input type="text" name="query" placeholder="Query" aria-label="Query Text" required />
+    <input type="text" name="query_field" placeholder="Column name" aria-label="Column name" />
+    <select name="query_table" aria-label="Select table ..." required>
+      <option selected disabled value="">
+        Select table ...
+      </option>
+      <option>product_data</option>
+    </select>
+    <input type="text" name="query_condition" placeholder="Condition" aria-label="Condition" />
     <input type="submit" value="Enquire" />
   </form>
 </main>

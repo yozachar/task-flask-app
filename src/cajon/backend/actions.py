@@ -56,5 +56,7 @@ def handle_query(query_text):
     """Handle Query."""
     with db.engine.connect() as conn:
         result = conn.execute(text(query_text))
-        rc = result.scalar()
-    flash(f"{rc or 'No'} records found.", category="info")
+        rc = result.rowcount
+    # SELECT * FROM user;
+    # SELECT * FROM product_data WHERE price > 20;
+    flash(f"{rc} record{'' if rc == 1 else 's'} found.", category="info")

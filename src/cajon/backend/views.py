@@ -36,7 +36,14 @@ def upload():
 def query():
     """Upload View."""
     if request.method == "POST":
-        query_text = request.form["query"]
+        query_field = request.form["query_field"]
+        query_table = request.form["query_table"]
+        query_condition = request.form["query_condition"]
+        # TODO: proper input sanitization
+        query_text = (
+            f"SELECT {query_field or "*"} FROM {query_table}"
+            + f"{' WHERE ' + query_condition if query_condition else '' };"
+        )
         handle_query(query_text)
         return redirect(url_for("views.query"))
     return render_template("actions/query.html", logged_in=current_user.is_authenticated)
