@@ -25,9 +25,9 @@ def handle_upload(r_file: FileStorage):
     filename = r_file.filename
 
     if not filename or (
-        "." in filename
-        and len(filename) < 3
-        and filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
+        "." not in filename
+        or len(filename) < 3
+        or filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
     ):
         flash("Invalid file or filename.", category="error")
         return
