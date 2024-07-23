@@ -8,7 +8,21 @@ from celery import Celery, Task
 from flask import Flask, flash, redirect, request, url_for
 from flask_login import current_user
 from pandas.errors import EmptyDataError
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import ProgrammingError, SQLAlchemyError
+
+
+def expect_query_errors(func):
+    """Query errors."""
+
+    @wraps(func)
+    def _decorated_function(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ProgrammingError:
+            flash("Bad query.", category="error")
+        return redirect(request.url)
+
+    return _decorated_function
 
 
 def expect_db_error(func):
@@ -18,7 +32,7 @@ def expect_db_error(func):
     def _decorated_function(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except (SQLAlchemyError, EmptyDataError) as e:
+        except (SQLAlchemyError, EmptyDataError):
             # print(e) # TODO: remove before production
             flash("Database error. Please contact developer.", category="error")
         return redirect(request.url)
