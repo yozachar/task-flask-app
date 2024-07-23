@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 # local
 from . import db
-from ._utils import auth_required, authenticated, expect_sql_error
+from ._utils import auth_required, authenticated, expect_db_error
 from .models import User
 
 auth = Blueprint("auth", __name__)
@@ -93,7 +93,7 @@ def _signup_checklist(name: str, email: str, password1: str, password2: str):
     return True
 
 
-@expect_sql_error
+@expect_db_error
 def _create_user(name: str, email: str, password: str):
     user = User(
         name=name,  # pyright: ignore[reportCallIssue]

@@ -7,19 +7,20 @@ from functools import wraps
 from celery import Celery, Task
 from flask import Flask, flash, redirect, request, url_for
 from flask_login import current_user
+from pandas.errors import EmptyDataError
 from sqlalchemy.exc import SQLAlchemyError
 
 
-def expect_sql_error(func):
+def expect_db_error(func):
     """Check authentication."""
 
     @wraps(func)
     def _decorated_function(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except SQLAlchemyError as e:
+        except (SQLAlchemyError, EmptyDataError) as e:
             # print(e) # TODO: remove before production
-            flash("DataBase error. Please contact developer.", category="error")
+            flash("Database error. Please contact developer.", category="error")
         return redirect(request.url)
 
     return _decorated_function
