@@ -9,7 +9,7 @@ from dask.dataframe import read_csv  # pyright: ignore[reportPrivateImportUsage]
 from dotenv import load_dotenv
 
 # local
-from . import cajon
+# from . import cajon
 
 load_dotenv()
 
@@ -29,7 +29,8 @@ def csv_to_sql(source: Path):
     ddf.to_sql(t_name, uri, if_exists="replace", method="multi")
 
 
-def action():
-    """Action."""
-    source = cajon / "backend/uploads/product_data 2024-07-23 16:30:01.590859.csv"
-    csv_to_sql(source)
+# ----> use for testing <----
+# def action():
+#     """Action."""
+#     source = cajon / "backend/uploads/product_data 2024-07-23 16:30:01.590859.csv"
+#     csv_to_sql(source)
