@@ -9,6 +9,7 @@ fi
 
 if [ $# -eq 0 ]; then
     echo "Usage: ./dev [udpv]"
+    echo "    l: run locally"
     echo "    u: start containers"
     echo "    d: stop and remove containers"
     echo "    p: prune dangling objects"
@@ -17,22 +18,33 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+if [ "$1" = "l" ]; then
+    podman-compose -p cajon -f compose.yaml up -d redis postgres \
+    && flask -A src.cajon.main run & celery -A src.cajon.main worker
+    exit $?
+fi
+
 if [ "$1" = "u" ]; then
     podman-compose -p cajon -f compose.yaml up -d
+    exit $?
 fi
 
 if [ "$1" = "d" ]; then
     podman-compose -p cajon -f compose.yaml down
+    exit $?
 fi
 
 if [ "$1" = "p" ]; then
     podman system prune --force
+    exit $?
 fi
 
 if [ "$1" = "v" ]; then
     podman system prune --volumes --force
+    exit $?
 fi
 
 if [ "$1" = "e" ]; then
     podman system prune --all --force
+    exit $?
 fi

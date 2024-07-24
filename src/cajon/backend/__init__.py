@@ -45,8 +45,8 @@ def _config_flask(app: Flask):
     # celery
     app.config.from_mapping(
         CELERY=dict(
-            broker_url="redis://localhost",
-            result_backend="redis://localhost",
+            broker_url="redis://0.0.0.0",
+            result_backend="redis://0.0.0.0",
             task_ignore_result=True,
         ),
     )
