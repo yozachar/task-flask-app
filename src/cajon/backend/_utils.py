@@ -59,7 +59,7 @@ def authenticated(func):
     @wraps(func)
     def _decorated_function(*args, **kwargs):
         if current_user.is_authenticated:
-            flash("Already Signed In!", category="success")
+            flash("Already signed in!", category="success")
             return redirect(url_for("views.home"))
         return func(*args, **kwargs)
 
