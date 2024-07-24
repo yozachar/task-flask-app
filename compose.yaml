@@ -18,7 +18,7 @@ services:
     image: "docker.io/postgres:latest"
     restart: "always"
     ports:
-      - "5432:5432"
+      - "$PG_DB_PORT:$PG_DB_PORT"
     environment:
       POSTGRES_USER: "$POSTGRES_USER"
       POSTGRES_DB: "$POSTGRES_DB"
@@ -30,6 +30,29 @@ services:
       retries: "10"
     volumes:
       - "pdb:/var/lib/postgresql/data"
+
+  # app
+  flask:
+    # ports:
+    #   - "5000:5000"
+    environment:
+      SECRET_KEY: "$SECRET_KEY"
+      PG_DB_HOST: "$PG_DB_HOST"
+      PG_DB_PORT: "$PG_DB_PORT"
+      POSTGRES_USER: "$POSTGRES_USER"
+      POSTGRES_DB: "$POSTGRES_DB"
+      POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+    build:
+      context: "."
+      dockerfile: "containerfile"
+    image: "cajon:dev"
+    container_name: "cajon_dev"
+    network_mode: "host"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
 volumes:
   rdb:

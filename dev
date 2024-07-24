@@ -1,0 +1,38 @@
+#!/bin/bash
+
+. ./.env
+
+if [ $? -eq 1 ]; then
+    # echo "E: Environment file not found"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "Usage: ./dev [udpv]"
+    echo "    u: start containers"
+    echo "    d: stop and remove containers"
+    echo "    p: prune dangling objects"
+    echo "    v: prune volumes"
+    echo "    e: prune everything"
+    exit 1
+fi
+
+if [ "$1" = "u" ]; then
+    podman-compose -p cajon -f compose.yaml up -d
+fi
+
+if [ "$1" = "d" ]; then
+    podman-compose -p cajon -f compose.yaml down
+fi
+
+if [ "$1" = "p" ]; then
+    podman system prune --force
+fi
+
+if [ "$1" = "v" ]; then
+    podman system prune --volumes --force
+fi
+
+if [ "$1" = "e" ]; then
+    podman system prune --all --force
+fi
