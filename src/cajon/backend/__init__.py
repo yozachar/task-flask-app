@@ -15,6 +15,20 @@ db = SQLAlchemy()
 cajon = Path(__file__).parent.parent
 
 
+def get_pg_uri(use_psycopg: bool = False):
+    """Postgres connection URI."""
+    # expect KeyError
+    _pg_user = environ["POSTGRES_USER"]
+    _pg_passwd = environ["POSTGRES_PASSWORD"]
+    _db_host = environ["PG_DB_HOST"]
+    _db_port = environ["PG_DB_PORT"]
+    _db_name = environ["POSTGRES_DB"]
+    return (
+        f"postgresql{'+psycopg' if use_psycopg else ''}://"
+        + f"{_pg_user}:{_pg_passwd}@{_db_host}:{_db_port}/{_db_name}"
+    )
+
+
 def _manage_session(app: Flask):
     login_manager = LoginManager()
     login_manager.login_view = "views.home"  # pyright: ignore[reportAttributeAccessIssue]
@@ -38,15 +52,7 @@ def _config_flask(app: Flask):
     app.config.from_prefixed_env()
 
     # database
-    # expect KeyError
-    _pg_user = environ["POSTGRES_USER"]
-    _pg_passwd = environ["POSTGRES_PASSWORD"]
-    _db_host = environ["PG_DB_HOST"]
-    _db_port = environ["PG_DB_PORT"]
-    _db_name = environ["POSTGRES_DB"]
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"postgresql+psycopg://{_pg_user}:{_pg_passwd}@{_db_host}:{_db_port}/{_db_name}"
-    )
+    app.config["SQLALCHEMY_DATABASE_URI"] = get_pg_uri(use_psycopg=True)
     # expect KeyError & sqlalchemy.exc.NoSuchModuleError
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024 * 1024  # 10 GB
@@ -86,4 +92,4 @@ def create_app():
     return app
 
 
-__all__ = ("create_app", "db", "cajon")
+__all__ = ("create_app", "db", "cajon", "get_pg_uri")

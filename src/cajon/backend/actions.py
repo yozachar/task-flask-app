@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 
 # local
 from . import cajon, db
-from .transactions import action, csv_to_sql
+from .transactions import action
 
 ALLOWED_EXTENSIONS = ("CSV",)
 UPLOAD_PATH = cajon / "backend/uploads"
