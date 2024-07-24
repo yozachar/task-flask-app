@@ -39,6 +39,7 @@ def _manage_session(app: Flask):
 def _config_flask(app: Flask):
     app.config["SECRET_KEY"] = environ["SECRET_KEY"]  # expect KeyError
     # NOTE: os.urandom(Integer) is an alternative to static SECRET_KEY
+    # TODO: provide config for UPLOAD_FOLDER
     app.config["UPLOAD_FOLDER"] = cajon / "backend/uploads"
 
     # celery

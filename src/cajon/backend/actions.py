@@ -14,9 +14,9 @@ from . import cajon, db
 from .transactions import action
 
 ALLOWED_EXTENSIONS = ("CSV",)
-UPLOAD_PATH = cajon / "backend/uploads"
-if not UPLOAD_PATH.exists():
-    UPLOAD_PATH.mkdir(parents=True)
+UPLOAD_FOLDER = cajon / "backend/uploads"
+if not UPLOAD_FOLDER.exists():
+    UPLOAD_FOLDER.mkdir(parents=True)
 
 
 @shared_task
@@ -35,7 +35,7 @@ def handle_upload():
 
     s_file = secure_filename(filename).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
     chunk_size = 1024**2  # 1MB
-    uploaded_file = UPLOAD_PATH / s_file
+    uploaded_file = UPLOAD_FOLDER / s_file
     flash("Uploading file ...", category="info")
     with uploaded_file.open("wb") as buf:
         while len(each_chunk := r_file.stream.read(chunk_size)) > 0:
