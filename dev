@@ -20,6 +20,7 @@ fi
 
 if [ "$1" = "l" ]; then
     podman-compose -p cajon -f compose.yaml up -d redis postgres \
+    && sleep 5 \
     && flask -A src.cajon.main run & celery -A src.cajon.main worker
     exit $?
 fi
