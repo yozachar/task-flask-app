@@ -4,7 +4,7 @@
 
 [project]
 name = "cajon"
-version = "0.1.2"
+version = "0.1.3"
 description = "A web application that allows users to log in, upload large CSV files (up to 1GB), and interact with the uploaded data through filtering. The application will display the count of records that match the applied filters."
 authors = [
     { name = "Jovial Joe Jayarson", email = "38415384+yozachar@users.noreply.github.com" },
