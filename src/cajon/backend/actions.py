@@ -7,7 +7,6 @@ from datetime import datetime
 from celery import shared_task
 from flask import flash, request
 from sqlalchemy import text
-from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 # local
@@ -23,33 +22,35 @@ if not UPLOAD_PATH.exists():
 @shared_task
 def handle_upload():
     """Handle upload."""
-    # filename = r_file.filename
+    r_file = request.files["file"]
+    filename = r_file.filename
 
-    # if not filename or (
-    #     "." not in filename
-    #     or len(filename) < 3
-    #     or filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
-    # ):
-    #     flash("Invalid file or filename.", category="error")
-    #     return
+    if not filename or (
+        "." not in filename
+        or len(filename) < 3
+        or filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
+    ):
+        flash("Invalid file or filename.", category="error")
+        return
 
-    # s_file = secure_filename(filename).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
-    # # r_file.save(UPLOAD_PATH / s_file)
-    # chunk_size = 4096
-    # uploaded_file = UPLOAD_PATH / s_file
-    # with uploaded_file.open("wb") as buf:
-    #     while len(each_chunk := request.stream.read(chunk_size)) > 0:
-    #         buf.write(each_chunk)
+    s_file = secure_filename(filename).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
+    chunk_size = 1024**2  # 1MB
+    uploaded_file = UPLOAD_PATH / s_file
+    flash("Uploading file ...", category="info")
+    with uploaded_file.open("wb") as buf:
+        while len(each_chunk := r_file.stream.read(chunk_size)) > 0:
+            buf.write(each_chunk)
 
-    # if uploaded_file.stat().st_size == 0:
-    #     flash("File is empty. Please try again.", category="error")
-    #     uploaded_file.unlink()
-    #     return
+    if uploaded_file.stat().st_size == 0:
+        flash("File is empty. Please try again.", category="error")
+        uploaded_file.unlink()
+        return
+    flash("File uploaded.", category="success")
 
-    # csv_to_sql(uploaded_file)
-    action()
-    flash("File uploaded successfully.", category="success")
-    # uploaded_file.unlink()
+    flash("Writing file to DB ...", category="info")
+    action(uploaded_file, s_file)
+    flash("File written to DB.", category="success")
+    uploaded_file.unlink()  # comment to verify
 
 
 def handle_query(query_text):

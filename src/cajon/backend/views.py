@@ -23,9 +23,7 @@ def upload():
     """Upload View."""
     if request.method == "POST":
         if "file" in request.files:
-            # r_file = request.files["file"]
             handle_upload.delay()
-            flash("Uploading file in the background ...", category="success")
         return redirect(url_for("views.upload"))
     return render_template("actions/upload.html", logged_in=current_user.is_authenticated)
 
