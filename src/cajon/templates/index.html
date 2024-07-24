@@ -14,3 +14,16 @@ Welcome
 <li><a href="/signup"><button>Register</button></a></li>
 {% endif %}
 {% endblock nav_actions %}
+
+{% block main %}
+<main>
+  <div class="welcome-msg">
+    {% if logged_in %}
+    <h1>Welcome back!</h1>
+    {% else %}
+    <h1>Hello!</h1>
+    <p>Please sign in or register.</p>
+    {% endif %}
+  </div>
+</main>
+{% endblock main %}
