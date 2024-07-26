@@ -1,72 +1,148 @@
 #!/bin/bash
 
+# Sub commands and usage
 if [ "$#" -eq 0 ] || [ "$1" = "h" ]; then
-    echo "Usage: ./dev [lm cd pv]"
+    echo "Usage: ./dev [i lm cd pv]"
+    echo "    i: install and setup project"
     echo "    l: start local                   m: cease local"
     echo "    c: start (and run) containers    d: cease (and remove) containers"
     echo "    p: prune dangling objects        v: prune volumes"
-    # echo "  e: prune everything"
+    # echo "    e: prune everything"
     exit 1
 fi
 
+# Check if the environment file exists
 if [ ! -f .env ]; then
     echo "E: Environment file \`.env\` not found"
     exit 1
 fi
 
+# Load the environment file
 . ./.env
 
+# Determine the containerization command
 cmd=''
-compose_cmd=''
-
+cmd_compose=''
 if command -v podman &>/dev/null && command -v podman-compose &>/dev/null; then
     cmd='podman'
-    compose_cmd='podman-compose'
+    cmd_compose='podman-compose'
 elif command -v docker &>/dev/null && command -v docker compose &>/dev/null; then
     cmd='docker'
-    compose_cmd='docker compose'
+    cmd_compose='docker compose'
 else
     echo "E: Program requires either podman(-compose) or docker(-compose)"
     exit 1
 fi
 
+# Handle sub commands
 case $1 in
+i)
+    # Install and setup
+    if [ -f .marker ]; then
+        echo "I: Project is ready"
+        echo "I: Pass h for help"
+        exit 0
+    fi
+
+    # Check if Python is installed
+    if ! command -v python &>/dev/null; then
+        echo "E: Please install Python"
+        exit 1
+    fi
+
+    # Create a virtual environment if it doesn't exist
+    if [ ! -d .venv ]; then
+        python -m venv .venv
+    fi
+
+    # Activate the virtual environment
+    . .venv/bin/activate
+    if [ $? -ne 0 ]; then
+        echo "E: Virtual environment activation failed"
+        exit 1
+    fi
+
+    # Check if pip is installed
+    if ! command -v pip &>/dev/null; then
+        echo "E: Cannot find pip"
+        exit 1
+    fi
+
+    # Install required packages
+    if ! command -v flask &>/dev/null || ! command -v celery &>/dev/null; then
+        pip install -r requirements.package.txt
+    fi
+
+    touch .marker
+    echo "I: Project is ready"
+    ;;
 l)
+    # Construct local deployment
+    if [ ! -f .marker ]; then
+        echo "E: Project not ready, please install and set it up"
+        echo "I: Pass h for help"
+        exit 1
+    fi
+
+    # Create the logs directory if it doesn't exist
     if [ ! -d "logs" ]; then
         mkdir logs
     fi
-    $compose_cmd -p cajon -f compose.yaml up -d redis postgres && sleep 5
+
+    # Start Redis and Postgres
+    $cmd_compose -p cajon -f compose.yaml up -d redis postgres && sleep 5
+
+    # Activate the virtual environment
+    . .venv/bin/activate
+    if [ $? -ne 0 ]; then
+        echo "E: Virtual environment activation failed"
+        echo "I: Pass h for help"
+        exit 1
+    fi
+
+    # Start Celery
     nohup celery -A src.cajon.main worker >logs/celery.log 2>&1 &
     CELERY_PID=$! && echo $CELERY_PID >logs/pid.log
     echo "Celery started with PID $CELERY_PID"
+
+    # Start Flask
     flask -A src.cajon.main run
     exit $?
     ;;
 m)
-    # if not killed along with the earlier process group
+    # Destruct local deployment
+    # Stop Celery (gets killed by CTRL+C on previous process group)
     # CELERY_PID=$(sed -n '1p' logs/pid.log)
     # if [ -n "$CELERY_PID" ]; then
     #     kill "$CELERY_PID" && echo "Stopped Celery process with PID $CELERY_PID."
     # fi
-    $compose_cmd -p cajon -f compose.yaml down redis postgres
+
+    # Stop Redis and Postgres
+    $cmd_compose -p cajon -f compose.yaml down redis postgres
+
+    # Remove the pod if using Podman
     if [ "$cmd" = "podman" ]; then
         $cmd pod rm pod_cajon
     fi
     exit $?
     ;;
 c)
-    $compose_cmd -p cajon -f compose.yaml up -d
+    # Construct containerized deployment
+    $cmd_compose -p cajon -f compose.yaml up -d
     exit $?
     ;;
 d)
-    $compose_cmd -p cajon -f compose.yaml down
+    # Destruct containerized deployment
+    $cmd_compose -p cajon -f compose.yaml down
     exit $?
     ;;
 p)
+    # Prune dangling objects
     $cmd system prune --force
     exit $?
     ;;
 v)
+    # Prune volumes
     $cmd system prune --volumes --force
     exit $?
     ;;
