@@ -7,15 +7,15 @@
 ### Containerized
 
 1. Clone the repository.
-2. Install & setup `podman` & `podman-compose`.
-3. Run `./dev u`.
+2. Install and setup `podman/docker` & `podman-compose/docker compose`.
+3. Run `./dev c` or `./dev.ps1 c`.
 
 ### Non-Containerized
 
 1. Clone the repository.
 2. Install `Python`, `PDM`, and the project dependencies.
-3. Install & setup `podman` & `podman-compose` (for databases).
-4. Run `./dev l`.
+3. Install and setup `podman/docker` & `podman-compose/docker compose` (for databases).
+4. Run `./dev l` or `./dev.ps1 l`.
 
 ## Screenshots
 
