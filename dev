@@ -1,51 +1,81 @@
 #!/bin/bash
 
-. ./.env
-
-if [ $? -eq 1 ]; then
-    # echo "E: Environment file not found"
+if [ $# -eq 0 ]; then
+    echo "Usage: ./dev [lm cd pv]"
+    echo "    l: start local                   m: cease local"
+    echo "    c: start (and run) containers    d: cease (and remove) containers"
+    echo "    p: prune dangling objects        v: prune volumes"
+    # echo "  e: prune everything"
     exit 1
 fi
 
-if [ $# -eq 0 ]; then
-    echo "Usage: ./dev [udpv]"
-    echo "    l: run locally"
-    echo "    u: start containers"
-    echo "    d: stop and remove containers"
-    echo "    p: prune dangling objects"
-    echo "    v: prune volumes"
-    echo "    e: prune everything"
+if [ ! -f .env ]; then
+    echo "E: Environment file \`.env\` not found"
+    exit 1
+fi
+
+. ./.env
+
+cmd=''
+compose_cmd=''
+
+if command -v podman &>/dev/null && command -v podman-compose &>/dev/null; then
+    cmd='podman'
+    compose_cmd='podman-compose'
+elif command -v docker &>/dev/null && command -v docker compose &>/dev/null; then
+    cmd='docker'
+    compose_cmd='docker compose'
+else
+    echo "E: Program requires either podman(-compose) or docker(-compose)."
     exit 1
 fi
 
 if [ "$1" = "l" ]; then
-    podman-compose -p cajon -f compose.yaml up -d redis postgres \
-    && sleep 5 \
-    && flask -A src.cajon.main run & celery -A src.cajon.main worker
+    if [ ! -d "logs" ]; then
+        mkdir logs
+    fi
+    $compose_cmd -p cajon -f compose.yaml up -d redis postgres && sleep 5
+    nohup celery -A src.cajon.main worker >logs/celery.log 2>&1 &
+    CELERY_PID=$! && echo $CELERY_PID >logs/pid.log
+    echo "Celery started with PID $CELERY_PID"
+    flask -A src.cajon.main run
     exit $?
 fi
 
-if [ "$1" = "u" ]; then
-    podman-compose -p cajon -f compose.yaml up -d
+if [ "$1" = "m" ]; then
+    # if not killed along with the earlier process group
+    # CELERY_PID=$(sed -n '1p' logs/pid.log)
+    # if [ -n "$CELERY_PID" ]; then
+    #     kill "$CELERY_PID" && echo "Stopped Celery process with PID $CELERY_PID."
+    # fi
+    $compose_cmd -p cajon -f compose.yaml down redis postgres
+    if [ "$cmd" = "podman" ]; then
+        $cmd pod rm pod_cajon
+    fi
+    exit $?
+fi
+
+if [ "$1" = "c" ]; then
+    $compose_cmd -p cajon -f compose.yaml up -d
     exit $?
 fi
 
 if [ "$1" = "d" ]; then
-    podman-compose -p cajon -f compose.yaml down
+    $compose_cmd -p cajon -f compose.yaml down
     exit $?
 fi
 
 if [ "$1" = "p" ]; then
-    podman system prune --force
+    $cmd system prune --force
     exit $?
 fi
 
 if [ "$1" = "v" ]; then
-    podman system prune --volumes --force
+    $cmd system prune --volumes --force
     exit $?
 fi
 
-if [ "$1" = "e" ]; then
-    podman system prune --all --force
-    exit $?
-fi
+# if [ "$1" = "e" ]; then
+#     $cmd system prune --all --force
+#     exit $?
+# fi

@@ -173,3 +173,4 @@ cython_debug/
 
 # project
 **/uploads/*.csv
+logs/
