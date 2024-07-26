@@ -4,18 +4,21 @@
 
 ## Local deployment
 
-### Containerized
+### Requirements - setup
 
-1. Clone the repository.
-2. Install and setup `podman/docker` & `podman-compose/docker compose`.
-3. Run `./dev c` or `./dev.ps1 c`.
+1. Git
+2. Python
+3. PDM
+4. Podman/Docker (with compose)
 
-### Non-Containerized
+### Process - Deploy
 
-1. Clone the repository.
-2. Install `Python`, `PDM`, and the project dependencies.
-3. Install and setup `podman/docker` & `podman-compose/docker compose` (for databases).
-4. Run `./dev l` or `./dev.ps1 l`.
+1. Clone the repository: `git clone https://github.com/yozachar/task-flask-app.git`
+2. Change directory `cd task-flask-app`
+3. Execute `./dev i` to install and set up the project.
+4. Run `./dev l` to launch the app.
+
+> On windows, you can use `dev.ps1`.
 
 ## Screenshots
 
@@ -41,7 +44,7 @@
 - [x] User Interface
 - [ ] Security (WIP)
 
-### Non-functional Requirements
+### Non-functional requirements
 
 - [x] Performance
 - [x] Scalability
