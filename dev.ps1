@@ -1,5 +1,7 @@
 #!/bin/pwsh
 
+$ErrorActionPreference="Stop"
+
 # Sub commands and usage
 if ($args.Count -eq 0 -or $args[0] -eq "h") {
     Write-Host "Usage: ./dev [i lm cd pv]"
