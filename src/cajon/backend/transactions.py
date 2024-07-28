@@ -6,6 +6,7 @@ from pathlib import Path
 from re import sub
 
 # external
+from celery import shared_task
 from dask.dataframe import read_csv  # pyright: ignore[reportPrivateImportUsage]
 import psycopg
 from psycopg.rows import TupleRow
@@ -86,13 +87,13 @@ def csv_to_sql(source: Path, t_name: str):
         _complete_transaction(conn, commit=True)
 
 
-# ----> TODO: use for testing <----
-def action(source: Path, filename: str):
+@shared_task
+def action(source: str, filename: str):
     """Action."""
     # source = cajon / "backend/uploads/product_data 2024-07-23 16:43:55.708747.csv"
     # source = cajon / "backend/uploads/companies_sorted.csv"
     try:
         t_name = _convert_to_valid_table_name(filename)
-        csv_to_sql(source, t_name)
+        csv_to_sql(Path(source), t_name)
     except psycopg.Error as e:
         log(DEBUG, e)  # TODO: remove in production

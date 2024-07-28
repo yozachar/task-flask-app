@@ -23,7 +23,7 @@ def upload():
     """Upload View."""
     if request.method == "POST":
         if "file" in request.files:
-            handle_upload.delay()
+            handle_upload()
         return redirect(url_for("views.upload"))
     return render_template("actions/upload.html", logged_in=current_user.is_authenticated)
 

@@ -4,7 +4,6 @@
 from datetime import datetime
 
 # external
-from celery import shared_task
 from flask import flash, request
 from sqlalchemy import text
 from werkzeug.utils import secure_filename
@@ -19,14 +18,14 @@ if not UPLOAD_FOLDER.exists():
     UPLOAD_FOLDER.mkdir(parents=True)
 
 
-@shared_task
 def handle_upload():
     """Handle upload."""
     r_file = request.files["file"]
     filename = r_file.filename
 
     if not filename or (
-        "." not in filename
+        r_file.mimetype != "text/csv"
+        or "." not in filename
         or len(filename) < 3
         or filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
     ):
@@ -48,7 +47,7 @@ def handle_upload():
     flash("File uploaded.", category="success")
 
     flash("Writing file to DB ...", category="info")
-    action(uploaded_file, s_file)
+    action.delay(str(uploaded_file.absolute()), s_file)
     flash("File written to DB.", category="success")
     uploaded_file.unlink()  # comment to verify
 
