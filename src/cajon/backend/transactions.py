@@ -66,7 +66,7 @@ def _copy_csv2sql(cur: psycopg.Cursor[TupleRow], source: Path, t_name: str):
     cur.execute(create_table_sql)  # pyright: ignore[reportArgumentType]
     from_csv_to_sql = f"COPY {t_name} FROM STDIN WITH (FORMAT CSV)"
     with cur.copy(from_csv_to_sql) as copy:  # pyright: ignore[reportArgumentType]
-        with source.open() as csv_f:
+        with source.open("rb") as csv_f:
             next(csv_f)
             while data := csv_f.read(50):
                 copy.write(data)
