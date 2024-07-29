@@ -33,7 +33,8 @@ Repository = "https://github.com/yozachar/task-flask-app"
 
 [tool.pdm.dev-dependencies]
 sast = ["bandit[toml]>=1.7.9"]
-tooling = ["black>=24.4.2", "djlint>=1.34.1", "pyright>=1.1.372", "ruff>=0.5.4"]
+testing = []
+tooling = ["black>=24.4.2", "djlint>=1.34.1", "pyright>=1.1.373", "ruff>=0.5.5"]
 
 ####################
 #  Configurations  #
