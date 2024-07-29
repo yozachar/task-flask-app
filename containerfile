@@ -1,4 +1,4 @@
-FROM docker.io/python:3-slim
+FROM docker.io/python:slim
 
 ENV SECRET_KEY \
     # postgres

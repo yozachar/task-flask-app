@@ -1,7 +1,7 @@
 services:
   # celery broker
   redis:
-    image: "docker.io/redis:latest"
+    image: "docker.io/redis:alpine"
     restart: "always"
     ports:
       - "6379:6379"
@@ -15,7 +15,7 @@ services:
 
   # primary db
   postgres:
-    image: "docker.io/postgres:latest"
+    image: "docker.io/postgres:alpine"
     restart: "always"
     ports:
       - "$PG_DB_PORT:$PG_DB_PORT"
@@ -50,10 +50,13 @@ services:
     network_mode: "host"
     depends_on:
       redis:
-        condition: service_healthy
+        condition: "service_healthy"
       postgres:
-        condition: service_healthy
+        condition: "service_healthy"
+    volumes:
+      - "adb:/app/src/cajon/backend/uploads"
 
 volumes:
-  rdb:
-  pdb:
+  rdb: # redis
+  pdb: # postgres
+  adb: # app

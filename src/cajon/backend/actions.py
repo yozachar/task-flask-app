@@ -6,6 +6,7 @@ from datetime import datetime
 # external
 from flask import flash, request
 from sqlalchemy import text
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 # local
@@ -18,38 +19,42 @@ if not UPLOAD_FOLDER.exists():
     UPLOAD_FOLDER.mkdir(parents=True)
 
 
-def handle_upload():
-    """Handle upload."""
-    r_file = request.files["file"]
-    filename = r_file.filename
-
-    if not filename or (
-        r_file.mimetype != "text/csv"
-        or "." not in filename
-        or len(filename) < 3
-        or filename.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
+def _check_file(name: str | None, mime: str):
+    if not name or (
+        mime != "text/csv"
+        or "." not in name
+        or len(name) < 3
+        or name.rsplit(".", 1)[1].upper() not in ALLOWED_EXTENSIONS
     ):
         flash("Invalid file or filename.", category="error")
         return
+    return secure_filename(name).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
 
-    s_file = secure_filename(filename).split(".", -1)[0] + " " + str(datetime.now()) + ".csv"
+
+def _upload_file(name: str, store: FileStorage):
     chunk_size = 1024**2  # 1MB
-    uploaded_file = UPLOAD_FOLDER / s_file
+    u_file = UPLOAD_FOLDER / name
     flash("Uploading file ...", category="info")
-    with uploaded_file.open("wb") as buf:
-        while len(each_chunk := r_file.stream.read(chunk_size)) > 0:
+    with u_file.open("wb") as buf:
+        while len(each_chunk := store.stream.read(chunk_size)) > 0:
             buf.write(each_chunk)
-
-    if uploaded_file.stat().st_size == 0:
+    if u_file.stat().st_size == 0:
         flash("File is empty. Please try again.", category="error")
-        uploaded_file.unlink()
+        u_file.unlink()
         return
     flash("File uploaded.", category="success")
+    return u_file
 
-    flash("Writing file to DB ...", category="info")
-    action.delay(str(uploaded_file.absolute()), s_file)
-    flash("File written to DB.", category="success")
-    uploaded_file.unlink()  # comment to verify
+
+def handle_upload():
+    """Handle upload."""
+    r_file = request.files["file"]
+    if not (s_file := _check_file(r_file.filename, r_file.mimetype)):
+        return
+    if not (u_file := _upload_file(s_file, r_file)):
+        return
+    action.delay(str(u_file.absolute()), s_file)
+    u_file.unlink()  # comment to verify
 
 
 def handle_query(query_text):

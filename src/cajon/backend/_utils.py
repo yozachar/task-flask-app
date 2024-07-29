@@ -68,7 +68,7 @@ def authenticated(func):
 
 def celery_init_app(app: Flask) -> Celery:
     """Celery init flask app."""
-    # https://flask.palletsprojects.com/en/2.2.x/patterns/celery/
+    # https://flask.palletsprojects.com/en/3.0.x/patterns/celery/#integrate-celery-with-flask
 
     class FlaskTask(Task):
         """Flask Task."""
