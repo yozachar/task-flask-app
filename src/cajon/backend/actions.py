@@ -54,7 +54,6 @@ def handle_upload():
     if not (u_file := _upload_file(s_file, r_file)):
         return
     action.delay(str(u_file.absolute()), s_file)
-    u_file.unlink()  # comment to verify
 
 
 def handle_query(query_text):

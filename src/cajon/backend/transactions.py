@@ -8,7 +8,6 @@ from re import sub
 # external
 from celery import shared_task
 from dask.dataframe import read_csv  # pyright: ignore[reportPrivateImportUsage]
-from flask import flash
 import psycopg
 from psycopg.rows import TupleRow
 
@@ -95,8 +94,10 @@ def action(source: str, filename: str):
     # source = cajon / "backend/uploads/companies_sorted.csv"
     try:
         t_name = _convert_to_valid_table_name(filename)
-        flash("Writing file to Database ...", category="info")
-        csv_to_sql(Path(source), t_name)
-        flash("File written to Database.", category="success")
+        # flash("Writing file to Database ...", category="info")
+        u_file = Path(source)
+        csv_to_sql(u_file, t_name)
+        # flash("File written to Database.", category="success")
+        u_file.unlink()  # comment to verify
     except psycopg.Error as e:
         log(DEBUG, e)  # TODO: remove in production
